@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-import modin.pandas as pd
-#import pandas as pd
-=======
-# import modin.pandas as pl
-import pandas as pd
->>>>>>> dcdb23290aeecefad42b179488926461e08d03c7
+import polars as pl
 import gzip
 import io
 import requests
@@ -40,8 +34,8 @@ else:
 
 
 def load_books():
-    books_df = pd.read_json(books_file, lines=True, chunksize=CHUNKSIZE)
-    genres_df = pd.read_json(genres_file, lines=True)
+    books_df = pl.read_json(books_file)
+    genres_df = pl.read_json(genres_file)
 
     if CHUNKSIZE:
         header = True
@@ -49,24 +43,24 @@ def load_books():
             chunk = chunk[KEEP_COLS]
             chunk.to_csv('data/books.csv', mode='a', header=header)
             header = False
-        books_df = pd.read_csv('data/books.csv')
+        books_df = pl.read_csv('data/books.csv')
 
-    genres_df = genres_df['genres'].apply(pd.Series).join(genres_df)
+    genres_df = genres_df['genres'].apply(pl.Series).join(genres_df)
     genres_df = genres_df.drop(columns=['genres']).fillna(0)
     genres_df = genres_df.set_index('book_id')
     genres_df = genres_df.apply(lambda x: x / x.sum(), axis=1)
 
-    books_df = books_df.merge(genres_df, on='book_id', how='right')
-    books_df = books_df[(books_df.fiction >= 0) & (books_df.fiction <= 1)]
+    books_df = books_df.join(genres_df, on='book_id', how='inner')
+    books_df = books_df[(books_df['fiction'] >= 0) & (books_df['fiction'] <= 1)]
     books_df = books_df.fillna(books_df.median())
     books_df.to_csv('data/books.csv')
 
 
 def load_interactions():
-    int_df = pd.read_csv(interactions_file)
-    read_counts = int_df.groupby(by='book_id').sum().sort_values('is_read', ascending=False)
-    read_counts = read_counts[read_counts.is_read >= MIN_READ]
-    int_df = int_df[int_df.book_id.isin(read_counts.index)]
+    int_df = pl.read_csv(interactions_file)
+    read_counts = int_df.groupby(by='book_id').sum().sort('is_read', descending=True)
+    read_counts = read_counts[read_counts['is_read'] >= MIN_READ]
+    int_df = int_df[int_df['book_id'].isin(read_counts.index)]
     int_df['shelved'] = 1
     int_df.to_csv('data/interactions.csv', index=False)
 
