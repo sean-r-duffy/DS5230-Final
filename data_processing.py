@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import modin.pandas as pd
 #import pandas as pd
-=======
-# import modin.pandas as pl
-import pandas as pd
->>>>>>> dcdb23290aeecefad42b179488926461e08d03c7
 import gzip
 import io
 import requests
@@ -51,7 +46,7 @@ def load_books():
             header = False
         books_df = pd.read_csv('data/books.csv')
 
-    genres_df = genres_df['genres'].apply(pd.Series).join(genres_df)
+    genres_df = genres_df[['genres']].apply(lambda x: pd.Series(x)).join(genres_df)
     genres_df = genres_df.drop(columns=['genres']).fillna(0)
     genres_df = genres_df.set_index('book_id')
     genres_df = genres_df.apply(lambda x: x / x.sum(), axis=1)
@@ -70,15 +65,15 @@ def load_interactions():
     int_df['shelved'] = 1
     int_df.to_csv('data/interactions.csv', index=False)
 
-    ratings_df = int_df.pivot(index='user_id', columns='book_id', values='rating')
+    ratings_df = int_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
     ratings_df.to_csv('data/ratings.csv')
     del ratings_df
 
-    read_df = int_df.pivot(index='user_id', columns='book_id', values='is_read')
+    read_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
     read_df.to_csv('data/read.csv')
     del read_df
 
-    shelved_df = int_df.pivot(index='user_id', columns='book_id', values='is_read')
+    shelved_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
     shelved_df.to_csv('data/shelved.csv')
     del shelved_df
 
