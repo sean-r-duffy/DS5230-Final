@@ -1,5 +1,4 @@
-import modin.pandas as pd
-#import pandas as pd
+import pandas as pd
 import gzip
 import io
 import requests
@@ -46,7 +45,7 @@ def load_books():
             header = False
         books_df = pd.read_csv('data/books.csv')
 
-    genres_df = genres_df[['genres']].apply(lambda x: pd.Series(x)).join(genres_df)
+    genres_df = genres_df[['genres']].apply(pd.Series).join(genres_df)
     genres_df = genres_df.drop(columns=['genres']).fillna(0)
     genres_df = genres_df.set_index('book_id')
     genres_df = genres_df.apply(lambda x: x / x.sum(), axis=1)
@@ -57,7 +56,7 @@ def load_books():
     books_df.to_csv('data/books.csv')
 
 
-def load_interactions():
+def load_interactions(ratings=True, read=True, shelved=True):
     int_df = pd.read_csv(interactions_file)
     read_counts = int_df.groupby(by='book_id').sum().sort_values('is_read', ascending=False)
     read_counts = read_counts[read_counts.is_read >= MIN_READ]
@@ -65,17 +64,20 @@ def load_interactions():
     int_df['shelved'] = 1
     int_df.to_csv('data/interactions.csv', index=False)
 
-    ratings_df = int_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
-    ratings_df.to_csv('data/ratings.csv')
-    del ratings_df
+    if ratings:
+        ratings_df = int_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+        ratings_df.to_csv('data/ratings.csv')
+        del ratings_df
 
-    read_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
-    read_df.to_csv('data/read.csv')
-    del read_df
+    if read:
+        read_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
+        read_df.to_csv('data/read.csv')
+        del read_df
 
-    shelved_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
-    shelved_df.to_csv('data/shelved.csv')
-    del shelved_df
+    if shelved:
+        shelved_df = int_df.pivot(index='user_id', columns='book_id', values='is_read').fillna(0)
+        shelved_df.to_csv('data/shelved.csv')
+        del shelved_df
 
 
 
