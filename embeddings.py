@@ -23,7 +23,7 @@ def perform_pca(dataframe, name, n_components=None):
 def perform_svd(dataframe, name):
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(dataframe)
-    u, s, vt = svd(df_scaled)
+    u, s, vt, info = svd(df_scaled)
 
     u_df = pd.DataFrame(u)
     u_df.to_csv(f'{name}_svd_U.csv', index=False)
