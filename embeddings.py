@@ -35,7 +35,7 @@ def perform_svd(dataframe, name):
     s_df.to_csv(f'{name}_svd_S.csv', index=False)
 
 
-def perform_nmf(dataframe, name, n_components=None):
+def perform_nmf(dataframe, name, n_components='auto'):
     nmf = NMF(n_components=n_components, init='random', random_state=41)
     nmf_components = nmf.fit_transform(dataframe)
 
