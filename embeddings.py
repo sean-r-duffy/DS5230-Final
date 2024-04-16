@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.decomposition import PCA, NMF
 from sklearn.preprocessing import StandardScaler
-from scipy.linalg import svd
-
+from scipy.sparse.linalg import svds
+from scipy.sparse import csr_matrix
 
 def perform_pca(dataframe, name, n_components=None):
     scaler = StandardScaler()
@@ -23,7 +23,7 @@ def perform_pca(dataframe, name, n_components=None):
 def perform_svd(dataframe, name):
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(dataframe)
-    u, s, vt, info = svd(df_scaled)
+    u, s, vt = svds(csr_matrix(df_scaled))
 
     u_df = pd.DataFrame(u)
     u_df.to_csv(f'{name}_svd_U.csv', index=False)
@@ -37,7 +37,7 @@ def perform_svd(dataframe, name):
 
 def perform_nmf(dataframe, name, n_components='auto'):
     nmf = NMF(n_components=n_components, init='random', random_state=41)
-    nmf_components = nmf.fit_transform(dataframe)
+    nmf_components = nmf.fit_transform(csr_matrix(dataframe))
 
     nmf_df = pd.DataFrame(nmf_components)
     nmf_df.to_csv(f'{name}_nmf_components.csv', index=False)
