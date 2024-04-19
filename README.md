@@ -6,6 +6,9 @@
 ### Project Planning:
 Part 1: https://docs.google.com/document/d/1xKFZmH4dOO6OqBcdNJ0HXAkBtv3woDC4Jp7m9yZ4WMk/edit?usp=sharing
 
+### Presentation Slides:
+https://docs.google.com/presentation/d/1pyM_0_tsZszR7pSAVCCp1GNgVqtTtPnTXcHaR6rK4Xs/edit?usp=sharing
+
 ### Work Schedule:
 | Sun                          | Mon                            | Tue | Wed | Thu | Fri                                            | Sat |
 |------------------------------|--------------------------------|-----|-----|-----|------------------------------------------------|-----|
